@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: business-plan-generator
+    env: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: OPENAI_API_KEY
+        sync: false
+    scaling:
+      minInstances: 1
+      maxInstances: 1 
