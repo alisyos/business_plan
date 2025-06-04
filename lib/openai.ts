@@ -154,6 +154,75 @@ export async function generateOutline(inputs: OutlineInputs): Promise<OutlineRes
   }
 }
 
+// 섹션별 사업계획서 생성 함수
+export async function generateBusinessPlanSection(inputs: {
+  title: string;
+  currentSection: any;
+  tone: string;
+  content: Record<string, any>;
+}): Promise<any> {
+  const sectionPrompt = `###지시사항 
+당신은 사업계획서 전문 작성 AI입니다. 주어진 섹션에 대해서만 상세한 내용을 작성하십시오.
+
+###입력변수
+- title: ${inputs.title}
+- section: ${JSON.stringify(inputs.currentSection)}
+- tone: ${inputs.tone}
+- content: ${JSON.stringify(inputs.content)}
+
+###생성규칙
+1. 주어진 섹션(heading과 subheadings)에 대해서만 내용을 작성합니다.
+2. 각 subheading 또는 heading에 대해 2-3개의 단락으로 구성합니다.
+3. 각 단락은 300-500자로 작성합니다.
+4. JSON 형식으로 응답합니다.
+
+###출력형식
+{
+  "heading": "섹션 제목",
+  "sections": [
+    { "subheading": "부제목", "content": ["단락1", "단락2"] }
+  ] 또는 "content": ["단락1", "단락2"] (subheading이 없는 경우)
+}`;
+
+  const completion = await openai.chat.completions.create({
+    model: "gpt-4.1",
+    messages: [
+      {
+        role: "user",
+        content: sectionPrompt
+      }
+    ],
+    temperature: 0.7,
+    max_tokens: 3000,
+  }, {
+    timeout: 25000,
+  });
+
+  const content = completion.choices[0].message.content;
+  if (!content) {
+    throw new Error('OpenAI API returned empty response');
+  }
+
+  try {
+    let jsonContent = content.trim();
+    
+    const jsonMatch = jsonContent.match(/```json\s*([\s\S]*?)\s*```/);
+    if (jsonMatch) {
+      jsonContent = jsonMatch[1];
+    } else {
+      const braceMatch = jsonContent.match(/\{[\s\S]*\}/);
+      if (braceMatch) {
+        jsonContent = braceMatch[0];
+      }
+    }
+    
+    return JSON.parse(jsonContent);
+  } catch (error) {
+    console.error('Failed to parse section response as JSON:', content);
+    throw new Error(`Failed to parse OpenAI response as JSON: ${error}`);
+  }
+}
+
 export async function generateBusinessPlan(inputs: BusinessPlanInputs): Promise<BusinessPlanResponse> {
   const prompt = BUSINESS_PLAN_PROMPT
     .replace('{{titleStructure}}', JSON.stringify(inputs.titleStructure))

@@ -141,7 +141,7 @@ export default function Home() {
     }
   };
 
-  // 사업계획서 생성
+  // 사업계획서 생성 (섹션별)
   const handleBusinessPlanGenerate = async () => {
     if (!editedOutline) return;
     
@@ -149,32 +149,71 @@ export default function Home() {
     setError('');
 
     try {
-      const response = await fetch('/api/business-plan', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          titleStructure: editedOutline,
-          content: {},
-          tone: formData.tone
-        }),
-      });
+      const sections = editedOutline.structure;
+      const generatedSections: any[] = [];
+      let hasError = false;
 
-      const result = await response.json();
+      // 각 섹션을 순차적으로 생성
+      for (let i = 0; i < sections.length; i++) {
+        if (hasError) break;
 
-      if (result.success) {
-        setBusinessPlan(result.data);
+        console.log(`섹션 ${i + 1}/${sections.length} 생성 중...`);
+        
+        try {
+          const response = await fetch('/api/business-plan-section', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              titleStructure: editedOutline,
+              sectionIndex: i,
+              tone: formData.tone,
+              content: {}
+            }),
+          });
+
+          const result = await response.json();
+
+          if (result.success && result.data.section) {
+            generatedSections.push(result.data.section);
+            
+            // 진행률 표시 (선택적)
+            const progress = Math.round(((i + 1) / sections.length) * 100);
+            setError(`사업계획서 생성 중... (${progress}%)`);
+          } else {
+            hasError = true;
+            setError(`섹션 ${i + 1} 생성에 실패했습니다: ${result.error}`);
+          }
+        } catch (sectionError) {
+          hasError = true;
+          setError(`섹션 ${i + 1} 생성 중 네트워크 오류가 발생했습니다.`);
+        }
+
+        // 섹션 간 짧은 딜레이 (API 부하 방지)
+        if (i < sections.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
+
+      if (!hasError && generatedSections.length > 0) {
+        // 전체 사업계획서 조합
+        const completeBusinessPlan = {
+          title: editedOutline.title,
+          report: generatedSections
+        };
+
+        setBusinessPlan(completeBusinessPlan);
         setActiveTab('businessplan');
-        // 성공 알림 (선택적)
+        setError('');
+        
+        // 성공 알림
         setTimeout(() => {
           alert('사업계획서가 성공적으로 생성되었습니다! 사업계획서 탭에서 확인하세요.');
         }, 500);
-      } else {
-        setError(`사업계획서 생성에 실패했습니다: ${result.error}`);
       }
     } catch (error) {
-      setError('사업계획서 생성 중 네트워크 오류가 발생했습니다.');
+      setError('사업계획서 생성 중 예기치 않은 오류가 발생했습니다.');
     } finally {
       setIsBusinessPlanLoading(false);
     }
