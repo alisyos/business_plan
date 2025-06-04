@@ -5,6 +5,7 @@ export interface OutlineRequest {
 export interface OutlineInputs {
   businessItem: string;
   businessDescription: string;
+  tone: string;
 }
 
 export interface OutlineResponse {
