@@ -9,7 +9,11 @@ export interface OutlineInputs {
 }
 
 export interface OutlineResponse {
-  outline: string;
+  title: string;
+  structure: Array<{
+    heading: string;
+    subheadings?: string[];
+  }>;
 }
 
 export interface BusinessPlanRequest {
@@ -23,7 +27,15 @@ export interface BusinessPlanInputs {
 }
 
 export interface BusinessPlanResponse {
-  businessPlan: string;
+  title: string;
+  report: Array<{
+    heading: string;
+    content?: string[];
+    sections?: Array<{
+      subheading: string;
+      content: string[];
+    }>;
+  }>;
 }
 
 export interface ApiResponse<T> {
