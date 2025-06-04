@@ -238,9 +238,9 @@ export async function generateBusinessPlan(inputs: BusinessPlanInputs): Promise<
       }
     ],
     temperature: 0.7,
-    max_tokens: 10000,
+    max_tokens: 3000, // 토큰 수를 대폭 줄여서 응답 시간 단축
   }, {
-    timeout: 50000, // 50초 타임아웃 설정
+    timeout: 30000, // 30초 타임아웃 설정
   });
 
   const content = completion.choices[0].message.content;
