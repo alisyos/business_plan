@@ -119,9 +119,9 @@ export async function generateOutline(inputs: OutlineInputs): Promise<OutlineRes
       }
     ],
     temperature: 0.7,
-    max_tokens: 5000,
+    max_tokens: 3000, // 토큰 수 조정
   }, {
-    timeout: 25000, // 25초 타임아웃 설정
+    timeout: 60000, // 60초 타임아웃 설정
   });
 
   const content = completion.choices[0].message.content;
@@ -171,9 +171,9 @@ export async function generateBusinessPlan(inputs: BusinessPlanInputs): Promise<
       }
     ],
     temperature: 0.7,
-    max_tokens: 3000, // 토큰 수를 대폭 줄여서 응답 시간 단축
+    max_tokens: 2000, // 토큰 수를 더 줄여서 응답 시간 단축
   }, {
-    timeout: 60000, // 60초 타임아웃 설정
+    timeout: 120000, // 120초 타임아웃 설정
   });
 
   const content = completion.choices[0].message.content;
