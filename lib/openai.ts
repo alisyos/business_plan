@@ -171,7 +171,7 @@ export async function generateBusinessPlan(inputs: BusinessPlanInputs): Promise<
       }
     ],
     temperature: 0.7,
-    max_tokens: 2000, // 토큰 수를 더 줄여서 응답 시간 단축
+    max_tokens: 4000, // JSON 완성을 위해 토큰 수 증가
   }, {
     timeout: 120000, // 120초 타임아웃 설정
   });
