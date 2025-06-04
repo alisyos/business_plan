@@ -450,7 +450,14 @@ export default function Home() {
               <div className="tab-content">
                 {editedOutline ? (
                   <div className="space-y-6">
-                    <h3 className="text-xl font-bold text-gray-900">목차 편집</h3>
+                    <div className="flex justify-between items-center">
+                      <h3 className="text-xl font-bold text-gray-900">목차 편집</h3>
+                      {isBusinessPlanLoading && (
+                        <div className="text-sm text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
+                          사업계획서 생성 중... (편집 불가)
+                        </div>
+                      )}
+                    </div>
                     
                     {/* 제목 편집 */}
                     <div>
@@ -461,7 +468,8 @@ export default function Home() {
                         type="text"
                         value={editedOutline.title}
                         onChange={handleTitleChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-lg"
+                        disabled={isBusinessPlanLoading}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-lg disabled:opacity-50 disabled:cursor-not-allowed"
                       />
                     </div>
 
@@ -478,7 +486,8 @@ export default function Home() {
                               type="text"
                               value={item.heading}
                               onChange={(e) => handleHeadingChange(structureIndex, e.target.value)}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium"
+                              disabled={isBusinessPlanLoading}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                             />
                           </div>
 
@@ -498,11 +507,13 @@ export default function Home() {
                                       type="text"
                                       value={subheading}
                                       onChange={(e) => handleSubheadingChange(structureIndex, subIndex, e.target.value)}
-                                      className="flex-1 px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                      disabled={isBusinessPlanLoading}
+                                      className="flex-1 px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
                                     />
                                     <button
                                       onClick={() => removeSubheading(structureIndex, subIndex)}
-                                      className="text-red-500 hover:text-red-700 px-2 py-1"
+                                      disabled={isBusinessPlanLoading}
+                                      className="text-red-500 hover:text-red-700 px-2 py-1 disabled:opacity-50 disabled:cursor-not-allowed"
                                       title="소제목 삭제"
                                     >
                                       ✕
@@ -516,7 +527,8 @@ export default function Home() {
                           {/* 소제목 추가 버튼 */}
                           <button
                             onClick={() => addSubheading(structureIndex)}
-                            className="mt-2 ml-4 text-blue-600 hover:text-blue-800 text-sm font-medium"
+                            disabled={isBusinessPlanLoading}
+                            className="mt-2 ml-4 text-blue-600 hover:text-blue-800 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             + 소제목 추가
                           </button>
