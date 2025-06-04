@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { OutlineInputs, OutlineResponse, BusinessPlanResponse } from '@/types';
+import { OutlineInputs, OutlineResponse, BusinessPlanResponse } from '../types';
 
 export default function Home() {
   // 폼 데이터 상태

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { generateBusinessPlan } from '@/lib/openai';
-import { BusinessPlanInputs, ApiResponse, BusinessPlanResponse } from '@/types';
+import { generateBusinessPlan } from '../../../lib/openai';
+import { BusinessPlanInputs, ApiResponse, BusinessPlanResponse } from '../../../types';
 
 export async function POST(request: NextRequest) {
   console.log('사업계획서 생성 요청 시작');

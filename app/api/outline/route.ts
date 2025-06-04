@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { generateOutline } from '@/lib/openai';
-import { OutlineInputs, ApiResponse, OutlineResponse } from '@/types';
+import { generateOutline } from '../../../lib/openai';
+import { OutlineInputs, ApiResponse, OutlineResponse } from '../../../types';
 
 export async function POST(request: NextRequest) {
   try {
