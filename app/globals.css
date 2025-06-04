@@ -663,4 +663,9 @@ button:disabled {
 
 .text-blue-800 {
   color: #1e40af;
+}
+
+/* 관리자 링크 스타일 */
+.admin-link:hover {
+  color: #2563eb !important;
 } 
