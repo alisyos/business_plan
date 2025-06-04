@@ -120,6 +120,8 @@ export async function generateOutline(inputs: OutlineInputs): Promise<OutlineRes
     ],
     temperature: 0.7,
     max_tokens: 5000,
+  }, {
+    timeout: 25000, // 25초 타임아웃 설정
   });
 
   const content = completion.choices[0].message.content;
@@ -168,6 +170,8 @@ export async function generateBusinessPlan(inputs: BusinessPlanInputs): Promise<
     ],
     temperature: 0.7,
     max_tokens: 10000,
+  }, {
+    timeout: 50000, // 50초 타임아웃 설정
   });
 
   const content = completion.choices[0].message.content;

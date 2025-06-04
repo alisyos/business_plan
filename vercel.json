@@ -7,9 +7,12 @@
   "functions": {
     "app/api/**/*.ts": {
       "maxDuration": 30
+    },
+    "app/api/business-plan/route.ts": {
+      "maxDuration": 60
+    },
+    "app/api/outline/route.ts": {
+      "maxDuration": 30
     }
-  },
-  "env": {
-    "OPENAI_API_KEY": "@openai_api_key"
   }
 } 
