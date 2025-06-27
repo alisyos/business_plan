@@ -30,6 +30,9 @@ export default function Home() {
   
   // 활성 탭
   const [activeTab, setActiveTab] = useState<'outline' | 'businessplan'>('outline');
+  
+  // 복사 상태
+  const [isCopied, setIsCopied] = useState(false);
 
   // 폼 입력 처리
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -166,10 +169,6 @@ export default function Home() {
       if (result.success) {
         setBusinessPlan(result.data);
         setActiveTab('businessplan');
-        // 성공 알림 (선택적)
-        setTimeout(() => {
-          alert('사업계획서가 성공적으로 생성되었습니다! 사업계획서 탭에서 확인하세요.');
-        }, 500);
       } else {
         setError(`사업계획서 생성에 실패했습니다: ${result.error}`);
       }
@@ -267,8 +266,176 @@ export default function Home() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-4">
-      <div className="grid grid-cols-3 gap-6 h-screen">
+    <div style={{ position: 'relative' }}>
+      {/* 로딩 모달 */}
+      {(isOutlineLoading || isBusinessPlanLoading) && (
+        <>
+          <style dangerouslySetInnerHTML={{
+            __html: `
+              @keyframes modalPulse {
+                0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
+                50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.1; }
+              }
+              @keyframes modalProgress {
+                0% { transform: translateX(-100%); }
+                100% { transform: translateX(100%); }
+              }
+              @keyframes modalDots {
+                0% { opacity: 0; }
+                25% { opacity: 1; }
+                50% { opacity: 0; }
+                75% { opacity: 1; }
+                100% { opacity: 0; }
+              }
+            `
+          }} />
+          
+          <div 
+            style={{ 
+              position: 'fixed',
+              top: 0, 
+              left: 0, 
+              right: 0, 
+              bottom: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.75)',
+              zIndex: 99999,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <div 
+              style={{
+                backgroundColor: 'white',
+                borderRadius: '16px',
+                width: '420px',
+                maxWidth: '90vw',
+                boxShadow: '0 25px 50px rgba(0, 0, 0, 0.25)',
+                border: '2px solid #e5e7eb',
+                overflow: 'hidden',
+                position: 'relative'
+              }}
+            >
+              {/* 모달 헤더 */}
+              <div style={{
+                backgroundColor: '#f8fafc',
+                borderBottom: '1px solid #e2e8f0',
+                padding: '16px 24px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px'
+              }}>
+                <div style={{
+                  width: '12px',
+                  height: '12px',
+                  backgroundColor: '#f59e0b',
+                  borderRadius: '50%'
+                }}></div>
+                <div style={{
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: '#374151'
+                }}>
+                  AI 사업계획서 생성기
+                </div>
+              </div>
+              
+              {/* 모달 내용 */}
+              <div style={{ 
+                padding: '32px 24px',
+                textAlign: 'center',
+                position: 'relative',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                minHeight: '130px'
+              }}>
+                {/* 펄스 배경 효과 */}
+                <div style={{
+                  position: 'absolute',
+                  top: '40%',
+                  left: '50%',
+                  width: '80px',
+                  height: '80px',
+                  borderRadius: '50%',
+                  backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                  animation: 'modalPulse 2s ease-in-out infinite',
+                  transform: 'translate(-50%, -50%)'
+                }}></div>
+
+                {/* 로딩 스피너 */}
+                <div style={{ marginBottom: '8px', position: 'relative' }}>
+                  <div className="inline-block animate-spin rounded-full h-14 w-14 border-b-3 border-blue-600" style={{
+                    borderWidth: '3px',
+                    borderTopColor: 'transparent',
+                    borderRightColor: 'transparent',
+                    borderLeftColor: 'transparent'
+                  }}></div>
+                </div>
+
+                {/* 제목 */}
+                <h3 style={{
+                  fontSize: '20px',
+                  fontWeight: '700',
+                  color: '#1f2937',
+                  marginBottom: '16px'
+                }}>
+                  {isOutlineLoading ? '목차 생성 중' : '사업계획서 생성 중'}
+                </h3>
+
+                {/* 메시지 */}
+                <p style={{
+                  color: '#6b7280',
+                  fontSize: '15px',
+                  lineHeight: '1.6',
+                  marginBottom: '24px'
+                }}>
+                  {isOutlineLoading 
+                    ? 'AI가 사업 아이템을 분석하여 목차를 생성하고 있습니다' 
+                    : 'AI가 목차를 바탕으로 상세한 사업계획서를 작성하고 있습니다'
+                  }
+                  <span style={{ 
+                    animation: 'modalDots 1.5s infinite'
+                  }}>...</span>
+                </p>
+
+                {/* 진행 바 */}
+                <div style={{
+                  width: '100%',
+                  height: '4px',
+                  backgroundColor: '#f1f5f9',
+                  borderRadius: '3px',
+                  overflow: 'hidden',
+                  marginBottom: '20px',
+                  position: 'relative'
+                }}>
+                  <div style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    height: '100%',
+                    width: '100%',
+                    background: 'linear-gradient(90deg, transparent, #3b82f6, transparent)',
+                    animation: 'modalProgress 2s linear infinite'
+                  }}></div>
+                </div>
+
+                {/* 하단 메시지 */}
+                <div style={{
+                  fontSize: '13px',
+                  color: '#9ca3af',
+                  fontWeight: '500'
+                }}>
+                  잠시만 기다려 주세요. 최대 1-2분이 소요될 수 있습니다.
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+      
+      <div className="max-w-7xl mx-auto p-4">
+        <div className="grid grid-cols-3 gap-6 h-screen">
         {/* 좌측: 입력 영역 (1/3) */}
         <div className="bg-white rounded-lg shadow-md p-6 overflow-y-auto">
           <div className="flex justify-between items-center mb-6">
@@ -439,7 +606,6 @@ export default function Home() {
                 className={`tab-button ${activeTab === 'businessplan' ? 'active' : ''}`}
               >
                 사업계획서 {businessPlan && <span className="ml-1 text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">완료</span>}
-                {isBusinessPlanLoading && <span className="ml-1 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">생성중</span>}
               </button>
             </div>
           </div>
@@ -452,11 +618,6 @@ export default function Home() {
                   <div className="space-y-6">
                     <div className="flex justify-between items-center">
                       <h3 className="text-xl font-bold text-gray-900">목차 편집</h3>
-                      {isBusinessPlanLoading && (
-                        <div className="text-sm text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
-                          사업계획서 생성 중... (편집 불가)
-                        </div>
-                      )}
                     </div>
                     
                     {/* 제목 편집 */}
@@ -612,12 +773,18 @@ export default function Home() {
                               }
                               return text;
                             }).join('\n');
-                            navigator.clipboard.writeText(reportText);
-                            alert('사업계획서가 클립보드에 복사되었습니다!');
+                            navigator.clipboard.writeText(reportText).then(() => {
+                              setIsCopied(true);
+                              setTimeout(() => setIsCopied(false), 2000);
+                            });
                           }}
-                          className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition duration-200"
-                        >
-                          복사
+                                                      className={`px-4 py-2 rounded-md transition duration-200 ${
+                              isCopied 
+                                ? 'bg-green-600 text-white hover:bg-green-700' 
+                                : 'bg-gray-600 text-white hover:bg-gray-700'
+                            }`}
+                          >
+                            {isCopied ? '복사완료!' : '복사'}
                         </button>
                       </div>
                     </div>
@@ -658,12 +825,6 @@ export default function Home() {
                         : '먼저 목차를 생성해주세요.'
                       }
                     </p>
-                    {isBusinessPlanLoading && (
-                      <div className="mt-4">
-                        <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-                        <p className="mt-2 text-sm">사업계획서를 생성하고 있습니다...</p>
-                      </div>
-                    )}
                   </div>
                 )}
               </div>
@@ -671,6 +832,7 @@ export default function Home() {
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 } 
